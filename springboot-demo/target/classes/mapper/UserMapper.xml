@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gyf.demo.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.gyf.demo.model.User">
+        <id column="uid" property="uid" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    uid, name, password
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from test_user
+        where uid = #{uid,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from test_user
+    where uid = #{uid,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteUsers" parameterType="list">
+        DELETE from test_user WHERE uid IN
+        <foreach collection="list" item="uid" open="(" separator="," close=")">
+            <if test="uid != null">
+                #{uid}
+            </if>
+        </foreach>
+    </delete>
+    <insert id="insert" parameterType="com.gyf.demo.model.User">
+    insert into test_user (uid, name, password
+      )
+    values (#{uid,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.gyf.demo.model.User">
+        insert into test_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uid != null">
+                uid,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uid != null">
+                #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.gyf.demo.model.User">
+        update test_user
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where uid = #{uid,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.gyf.demo.model.User">
+    update test_user
+    set name = #{name,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR}
+    where uid = #{uid,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectByCondSelective" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM test_user
+        <include refid="dynamicCondSql"/>
+    </select>
+
+    <select id="countByCondSelective" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM test_user
+        <include refid="dynamicCondSql"/>
+    </select>
+
+    <sql id="dynamicCondSql">
+        <where>
+            <if test="uid != null">
+                AND uid = #{uid}
+            </if>
+            <if test="name != null and name != ''">
+                AND name = #{name}
+            </if>
+        </where>
+    </sql>
+</mapper>
